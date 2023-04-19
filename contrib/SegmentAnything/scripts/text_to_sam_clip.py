@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+os.environ['FLAGS_use_cuda_managed_memory'] = "true"
 import cv2
 import time
 import sys
@@ -153,6 +154,8 @@ def get_id_photo_output(image, text):
     cropped_objects = []
     image_pil = Image.fromarray(image)
     for mask in masks:
+        if mask["bbox"][2] == 0 or mask["bbox"][3] == 0:
+            continue
         bbox = [
             mask["bbox"][0], mask["bbox"][1], mask["bbox"][0] + mask["bbox"][2],
             mask["bbox"][1] + mask["bbox"][3]
@@ -186,7 +189,7 @@ def get_id_photo_output(image, text):
 def gradio_display():
     import gradio as gr
     examples_sam = [["./examples/cityscapes_demo.png", "a photo of car"],
-                    ["examples/dog.jpg", "dog"],
+                    ["examples/dog.jpg", "dog and bowl"],
                     ["examples/zixingche.jpeg", "kid"]]
 
     demo_mask_sam = gr.Interface(
